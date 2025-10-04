@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Expense Manager</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .login-container {
+      background-color: #1e1e1e;
+      padding: 30px;
+      border-radius: 12px;
+      width: 320px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+    }
+    .login-container h2 { color: #00d4ff; }
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+    }
+    input, select { background: #2c2c2c; color: #fff; }
+    button { background: #00d4ff; color: #121212; font-weight: bold; cursor: pointer; }
+    button:hover { background: #00aacc; }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Expense Manager</h2>
+    <input type="text" id="userid" placeholder="User ID" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <select id="role" required>
+      <option value="">Select Role</option>
+      <option value="employee">Employee</option>
+      <option value="manager">Manager</option>
+      <option value="admin">Admin</option>
+    </select>
+    <button onclick="login()">Login</button>
+    <button onclick="register()">Register</button>
+  </div>
+
+  <script>
+    const API_URL = "http://localhost:5000";
+
+    async function register() {
+      const id = document.getElementById("userid").value;
+      const password = document.getElementById("password").value;
+      const role = document.getElementById("role").value;
+
+      let res = await fetch(`${API_URL}/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, password, role })
+      });
+      let data = await res.json();
+      alert(data.message);
+    }
+
+    async function login() {
+      const id = document.getElementById("userid").value;
+      const password = document.getElementById("password").value;
+      const role = document.getElementById("role").value;
+
+      let res = await fetch(`${API_URL}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, password, role })
+      });
+      let data = await res.json();
+
+      if (res.ok) {
+        alert("Login successful as " + role);
+        if (role === "employee") window.location.href = "employee.html";
+        else if (role === "manager") window.location.href = "manager.html";
+        else if (role === "admin") window.location.href = "admin.html";
+      } else {
+        alert(data.message);
+      }
+    }
+  </script>
+</body>
+</html>
