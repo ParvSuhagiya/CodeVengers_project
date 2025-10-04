@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -14,7 +14,7 @@
       height: 100vh;
     }
 
-    /* Sidebar */
+    
     .sidebar {
       width: 220px;
       background-color: #1e1e1e;
@@ -42,7 +42,7 @@
       background-color: #00aacc;
     }
 
-    /* Main content */
+    
     .main {
       flex: 1;
       padding: 20px;
@@ -84,7 +84,7 @@
   </style>
 </head>
 <body>
-  <!-- Sidebar -->
+  
   <div class="sidebar">
     <h2>Dashboard</h2>
     <a href="#">Home</a>
@@ -94,11 +94,11 @@
     <a href="login.html">Logout</a>
   </div>
 
-  <!-- Main Content -->
+  
   <div class="main">
     <h1>Welcome, Employee</h1>
 
-    <!-- Example card: Submit Expense -->
+    
     <div class="card">
       <h3>Submit Expense</h3>
       <form>
@@ -110,11 +110,374 @@
       </form>
     </div>
 
-    <!-- Example card: Pending Approvals -->
+    
     <div class="card">
       <h3>Pending Approvals</h3>
       <p>No pending requests.</p>
     </div>
   </div>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Expense Manager - Admin Dashboard</title>
+
+  <!-- FontAwesome for icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --background-color: #0a0a0a;
+      --surface-color: rgba(20, 20, 20, 0.85);
+      --primary-color: #00d4ff;
+      --primary-hover-color: #00b8e6;
+      --text-color: #ffffff;
+      --text-secondary-color: #a0a0a0;
+      --input-color: #1a1a1a;
+      --input-border: rgba(255, 255, 255, 0.1);
+      --success-color: #2ecc71;
+      --error-color: #e74c3c;
+      --warning-color: #f39c12;
+      --card-color: rgba(30, 30, 30, 0.7);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Segoe UI", sans-serif; }
+
+    body {
+      background: var(--background-color);
+      color: var(--text-color);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      width: 240px;
+      background: var(--surface-color);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      transition: width 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+    .sidebar.collapsed { width: 70px; }
+    .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); margin-bottom: 30px; }
+    .nav-links { list-style: none; }
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      color: var(--text-secondary-color);
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background 0.3s, color 0.3s;
+    }
+    .nav-link:hover { background: rgba(255,255,255,0.05); color: var(--text-color); }
+    .nav-link.active { background: var(--primary-color); color: #000; font-weight: bold; }
+    .nav-link i { margin-right: 10px; }
+    .sidebar.collapsed .nav-link span { display: none; }
+
+    /* ===== MAIN CONTENT ===== */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--background-color);
+      transition: margin-left 0.3s ease;
+      overflow-y: auto;
+    }
+    .topbar {
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      border-bottom: 1px solid var(--input-border);
+      background: var(--surface-color);
+      backdrop-filter: blur(10px);
+    }
+    .toggle-btn { font-size: 1.2rem; cursor: pointer; color: var(--text-color); }
+
+    /* ===== BREADCRUMB ===== */
+    .breadcrumb { font-size: 0.9rem; color: var(--text-secondary-color); margin: 20px; }
+    .breadcrumb span { color: var(--primary-color); }
+
+    /* ===== PAGE CONTENT ===== */
+    .page { padding: 20px; animation: fadeIn 0.4s ease; }
+    .page h2 { margin-bottom: 20px; color: var(--primary-color); }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+    .card { background: var(--card-color); padding: 20px; border-radius: 12px; border: 1px solid var(--input-border); box-shadow: 0 2px 8px rgba(0,0,0,0.5); backdrop-filter: blur(8px); }
+    .card h3 { margin-bottom: 10px; color: var(--text-color); }
+    .card p { color: var(--text-secondary-color); }
+
+    /* ===== TABLES ===== */
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--input-border); }
+    th { background: var(--surface-color); color: var(--primary-color); }
+    tr:hover { background: rgba(255,255,255,0.05); }
+
+    /* ===== BUTTONS ===== */
+    .btn-primary { background: var(--primary-color); border: none; padding: 8px 14px; border-radius: 6px; color: #000; cursor: pointer; font-weight: bold; transition: background 0.3s; }
+    .btn-primary:hover { background: var(--primary-hover-color); }
+
+    /* ===== STATUS COLORS ===== */
+    .status-success { color: var(--success-color); font-weight: bold; }
+    .status-error { color: var(--error-color); font-weight: bold; }
+    .status-warning { color: var(--warning-color); font-weight: bold; }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px);} to { opacity: 1; transform: translateY(0);} }
+  </style>
+</head>
+<body>
+  <!-- ===== SIDEBAR ===== -->
+  <div class="sidebar" id="sidebar">
+    <div class="logo">ExpenseManager</div>
+    <ul class="nav-links">
+      <li class="nav-link active" data-page="dashboard"><i class="fas fa-home"></i><span>Dashboard</span></li>
+      <li class="nav-link" data-page="createCompany"><i class="fas fa-building"></i><span>Create Company</span></li>
+      <li class="nav-link" data-page="manageUsers"><i class="fas fa-users-cog"></i><span>Manage Users</span></li>
+      <li class="nav-link" data-page="setRoles"><i class="fas fa-user-shield"></i><span>Set Roles</span></li>
+      <li class="nav-link" data-page="configureRules"><i class="fas fa-sliders-h"></i><span>Configure Approval Rules</span></li>
+      <li class="nav-link" data-page="viewExpenses"><i class="fas fa-file-invoice-dollar"></i><span>View All Expenses</span></li>
+      <li class="nav-link" data-page="overrideApprovals"><i class="fas fa-pen-square"></i><span>Override Approvals</span></li>
+      <li class="nav-link" data-page="employees"><i class="fas fa-users"></i><span>Employees</span></li>
+      <li class="nav-link" data-page="expenses"><i class="fas fa-file-invoice-dollar"></i><span>Expenses</span></li>
+      <li class="nav-link" data-page="reports"><i class="fas fa-chart-line"></i><span>Reports</span></li>
+      <li class="nav-link" data-page="settings"><i class="fas fa-cog"></i><span>Settings</span></li>
+    </ul>
+  </div>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <div class="main" id="mainContent">
+    <div class="topbar">
+      <div class="toggle-btn" id="toggleSidebar"><i class="fas fa-bars"></i></div>
+      <div class="user"><i class="fas fa-user-circle"></i> Admin</div>
+    </div>
+
+    <div class="breadcrumb" id="breadcrumb">Home / <span>Dashboard</span></div>
+    <div class="page" id="pageContent"></div>
+  </div>
+
+  <!-- ===== JS LOGIC ===== -->
+  <script>
+    class Dashboard {
+      constructor() {
+        this.currentPage = "dashboard";
+        this.sidebarCollapsed = false;
+        this.init();
+      }
+
+      init() {
+        this.bindEvents();
+        this.loadNavigationState();
+      }
+
+      bindEvents() {
+        document.querySelectorAll(".nav-link").forEach(link => {
+          link.addEventListener("click", () => this.navigateTo(link.dataset.page));
+        });
+        document.getElementById("toggleSidebar")
+          .addEventListener("click", () => this.toggleSidebar());
+      }
+
+      toggleSidebar() {
+        this.sidebarCollapsed = !this.sidebarCollapsed;
+        document.getElementById("sidebar").classList.toggle("collapsed");
+        this.saveNavigationState();
+      }
+
+      navigateTo(page) {
+        this.currentPage = page;
+        this.updateActiveNav();
+        this.renderCurrentPage();
+        this.saveNavigationState();
+      }
+
+      updateActiveNav() {
+        document.querySelectorAll(".nav-link").forEach(link => {
+          link.classList.remove("active");
+          if (link.dataset.page === this.currentPage) {
+            link.classList.add("active");
+          }
+        });
+      }
+
+      renderCurrentPage() {
+        const content = document.getElementById("pageContent");
+        const breadcrumb = document.getElementById("breadcrumb");
+        let html = "";
+
+        switch(this.currentPage) {
+          case "dashboard":
+            html = `
+              <h2>Dashboard</h2>
+              <div class="cards">
+                <div class="card"><h3>Total Employees</h3><p>128</p></div>
+                <div class="card"><h3>Monthly Expenses</h3><p>$45,200</p></div>
+                <div class="card"><h3>Pending Approvals</h3><p class="status-warning">12</p></div>
+                <div class="card"><h3>Approval Rate</h3><p class="status-success">89%</p></div>
+              </div>`;
+            break;
+
+          case "createCompany":
+            html = `
+              <h2>Create Company</h2>
+              <div class="card">
+                <p>Auto-created company on signup:</p>
+                <ul>
+                  <li>Company Name: <strong>Acme Corp</strong></li>
+                  <li>Admin: <strong>John Doe</strong></li>
+                  <li>Plan: <strong>Premium</strong></li>
+                </ul>
+                <button class="btn-primary">Edit Company Info</button>
+              </div>`;
+            break;
+
+          case "manageUsers":
+            html = `
+              <h2>Manage Users</h2>
+              <table>
+                <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td>Jane Smith</td><td>jane@acme.com</td><td>Finance</td><td class="status-success">Active</td></tr>
+                  <tr><td>Mike Johnson</td><td>mike@acme.com</td><td>HR</td><td class="status-warning">Onboarding</td></tr>
+                  <tr><td>Emily Davis</td><td>emily@acme.com</td><td>IT</td><td class="status-success">Active</td></tr>
+                </tbody>
+              </table>`;
+            break;
+
+          case "setRoles":
+            html = `
+              <h2>Set Roles</h2>
+              <div class="card">
+                <p>Assign roles to users:</p>
+                <ul>
+                  <li>John Doe: <strong>Admin</strong></li>
+                  <li>Jane Smith: <strong>Manager</strong></li>
+                  <li>Mike Johnson: <strong>Employee</strong></li>
+                </ul>
+                <button class="btn-primary">Update Roles</button>
+              </div>`;
+            break;
+
+          case "configureRules":
+            html = `
+              <h2>Configure Approval Rules</h2>
+              <div class="card">
+                <p>Current Approval Rules:</p>
+                <ul>
+                  <li>Expenses &lt; $500: Auto-approve</li>
+                  <li>$500 - $2000: Manager approval</li>
+                  <li>&gt; $2000: Admin approval</li>
+                </ul>
+                <button class="btn-primary">Edit Rules</button>
+              </div>`;
+            break;
+
+          case "viewExpenses":
+            html = `
+              <h2>View All Expenses</h2>
+              <table>
+                <thead><tr><th>Employee</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+                <tbody>
+                  <tr><td>Jane Smith</td><td>$320</td><td class="status-success">Approved</td><td>2025-10-01</td></tr>
+                  <tr><td>Mike Johnson</td><td>$150</td><td class="status-warning">Pending</td><td>2025-10-02</td></tr>
+                  <tr><td>Emily Davis</td><td>$500</td><td class="status-success">Approved</td><td>2025-10-03</td></tr>
+                  <tr><td>Chris Lee</td><td>$100</td><td class="status-error">Rejected</td><td>2025-10-04</td></tr>
+                </tbody>
+              </table>`;
+            break;
+
+          case "overrideApprovals":
+            html = `
+              <h2>Override Approvals</h2>
+              <table>
+                <thead><tr><th>Employee</th><th>Expense</th><th>Status</th><th>Override By</th></tr></thead>
+                <tbody>
+                  <tr><td>Mike Johnson</td><td>$150</td><td class="status-success">Approved</td><td>Admin</td></tr>
+                  <tr><td>Chris Lee</td><td>$100</td><td class="status-success">Approved</td><td>Admin</td></tr>
+                </tbody>
+              </table>`;
+            break;
+
+          case "employees":
+            html = `
+              <h2>Employees</h2>
+              <table>
+                <thead><tr><th>Name</th><th>Department</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td>Jane Smith</td><td>Finance</td><td class="status-success">Active</td></tr>
+                  <tr><td>Mike Johnson</td><td>HR</td><td class="status-warning">Onboarding</td></tr>
+                  <tr><td>Emily Davis</td><td>IT</td><td class="status-success">Active</td></tr>
+                  <tr><td>Chris Lee</td><td>Marketing</td><td class="status-error">Inactive</td></tr>
+                </tbody>
+              </table>`;
+            break;
+
+          case "expenses":
+            html = `
+              <h2>Expenses</h2>
+              <table>
+                <thead><tr><th>Employee</th><th>Amount</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td>Jane Smith</td><td>$320</td><td class="status-success">Approved</td></tr>
+                  <tr><td>Mike Johnson</td><td>$150</td><td class="status-warning">Pending</td></tr>
+                  <tr><td>Emily Davis</td><td>$500</td><td class="status-success">Approved</td></tr>
+                  <tr><td>Chris Lee</td><td>$100</td><td class="status-error">Rejected</td></tr>
+                </tbody>
+              </table>`;
+            break;
+
+          case "reports":
+            html = `
+              <h2>Reports</h2>
+              <div class="cards">
+                <div class="card"><h3>Quarterly Expenses</h3><p>$120,000</p></div>
+                <div class="card"><h3>Top Spender</h3><p>Emily Davis - $5,200</p></div>
+                <div class="card"><h3>Most Active Dept</h3><p>IT Department</p></div>
+              </div>`;
+            break;
+
+          case "settings":
+            html = `
+              <h2>Settings</h2>
+              <div class="card">
+                <p>Manage system preferences here.</p>
+                <button class="btn-primary">Save Changes</button>
+              </div>`;
+            break;
+        }
+
+        content.innerHTML = html;
+        breadcrumb.innerHTML = `Home / <span>${this.capitalize(this.currentPage)}</span>`;
+      }
+
+      capitalize(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
+
+      saveNavigationState() {
+        const state = { page: this.currentPage, collapsed: this.sidebarCollapsed };
+        localStorage.setItem("navState", JSON.stringify(state));
+      }
+
+      loadNavigationState() {
+        const state = JSON.parse(localStorage.getItem("navState"));
+        if (state) {
+          this.currentPage = state.page;
+          this.sidebarCollapsed = state.collapsed;
+          if (this.sidebarCollapsed) document.getElementById("sidebar").classList.add("collapsed");
+        }
+        this.updateActiveNav();
+        this.renderCurrentPage();
+      }
+    }
+
+    new Dashboard();
+  </script>
 </body>
 </html>

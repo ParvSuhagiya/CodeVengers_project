@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Expense Manager - Manager Dashboard</title>
+
+  <!-- FontAwesome for icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --background-color: #0a0a0a;
+      --surface-color: rgba(20, 20, 20, 0.85);
+      --primary-color: #00d4ff;
+      --primary-hover-color: #00b8e6;
+      --text-color: #ffffff;
+      --text-secondary-color: #a0a0a0;
+      --input-color: #1a1a1a;
+      --input-border: rgba(255, 255, 255, 0.1);
+      --success-color: #2ecc71;
+      --error-color: #e74c3c;
+      --warning-color: #f39c12;
+      --card-color: rgba(30, 30, 30, 0.7);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Segoe UI", sans-serif; }
+
+    body { background: var(--background-color); color: var(--text-color); display: flex; height: 100vh; overflow: hidden; }
+
+    .sidebar { width: 240px; background: var(--surface-color); padding: 20px; display: flex; flex-direction: column; transition: width 0.3s ease; backdrop-filter: blur(10px); }
+    .sidebar.collapsed { width: 70px; }
+    .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); margin-bottom: 30px; }
+    .nav-links { list-style: none; }
+    .nav-link { display: flex; align-items: center; padding: 12px; color: var(--text-secondary-color); cursor: pointer; border-radius: 8px; transition: background 0.3s, color 0.3s; }
+    .nav-link:hover { background: rgba(255,255,255,0.05); color: var(--text-color); }
+    .nav-link.active { background: var(--primary-color); color: #000; font-weight: bold; }
+    .nav-link i { margin-right: 10px; }
+    .sidebar.collapsed .nav-link span { display: none; }
+
+    .main { flex: 1; display: flex; flex-direction: column; background: var(--background-color); transition: margin-left 0.3s ease; overflow-y: auto; }
+    .topbar { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid var(--input-border); background: var(--surface-color); backdrop-filter: blur(10px); }
+    .toggle-btn { font-size: 1.2rem; cursor: pointer; color: var(--text-color); }
+
+    .breadcrumb { font-size: 0.9rem; color: var(--text-secondary-color); margin: 20px; }
+    .breadcrumb span { color: var(--primary-color); }
+
+    .page { padding: 20px; animation: fadeIn 0.4s ease; }
+    .page h2 { margin-bottom: 20px; color: var(--primary-color); }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+    .card { background: var(--card-color); padding: 20px; border-radius: 12px; border: 1px solid var(--input-border); box-shadow: 0 2px 8px rgba(0,0,0,0.5); backdrop-filter: blur(8px); }
+    .card h3 { margin-bottom: 10px; color: var(--text-color); }
+    .card p { color: var(--text-secondary-color); }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--input-border); }
+    th { background: var(--surface-color); color: var(--primary-color); }
+    tr:hover { background: rgba(255,255,255,0.05); }
+
+    .btn-primary { background: var(--primary-color); border: none; padding: 8px 14px; border-radius: 6px; color: #000; cursor: pointer; font-weight: bold; transition: background 0.3s; }
+    .btn-primary:hover { background: var(--primary-hover-color); }
+
+    .status-success { color: var(--success-color); font-weight: bold; }
+    .status-error { color: var(--error-color); font-weight: bold; }
+    .status-warning { color: var(--warning-color); font-weight: bold; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px);} to { opacity: 1; transform: translateY(0);} }
+  </style>
+</head>
+<body>
+  <div class="sidebar" id="sidebar">
+    <div class="logo">ExpenseManager</div>
+    <ul class="nav-links">
+      <li class="nav-link active" data-page="dashboard"><i class="fas fa-home"></i><span>Dashboard</span></li>
+      <li class="nav-link" data-page="approveExpenses"><i class="fas fa-check-circle"></i><span>Approve/Reject Expenses</span></li>
+      <li class="nav-link" data-page="teamExpenses"><i class="fas fa-users"></i><span>View Team Expenses</span></li>
+      <li class="nav-link" data-page="escalateRules"><i class="fas fa-arrow-up"></i><span>Escalate as per Rules</span></li>
+      <li class="nav-link" data-page="analytics"><i class="fas fa-chart-pie"></i><span>Analytics</span></li>
+    </ul>
+  </div>
+
+  <div class="main" id="mainContent">
+    <div class="topbar">
+      <div class="toggle-btn" id="toggleSidebar"><i class="fas fa-bars"></i></div>
+      <div class="user"><i class="fas fa-user-circle"></i> Manager</div>
+    </div>
+
+    <div class="breadcrumb" id="breadcrumb">Home / <span>Dashboard</span></div>
+    <div class="page" id="pageContent"></div>
+  </div>
+
+  <script>
+    class ManagerDashboard {
+      constructor() {
+        this.currentPage = "dashboard";
+        this.sidebarCollapsed = false;
+        this.init();
+      }
+
+      init() {
+        this.bindEvents();
+        this.loadNavigationState();
+      }
+
+      bindEvents() {
+        document.querySelectorAll(".nav-link").forEach(link => {
+          link.addEventListener("click", () => this.navigateTo(link.dataset.page));
+        });
+        document.getElementById("toggleSidebar")
+          .addEventListener("click", () => this.toggleSidebar());
+      }
+
+      toggleSidebar() {
+        this.sidebarCollapsed = !this.sidebarCollapsed;
+        document.getElementById("sidebar").classList.toggle("collapsed");
+        this.saveNavigationState();
+      }
+
+      navigateTo(page) {
+        this.currentPage = page;
+        this.updateActiveNav();
+        this.renderCurrentPage();
+        this.saveNavigationState();
+      }
+
+      updateActiveNav() {
+        document.querySelectorAll(".nav-link").forEach(link => {
+          link.classList.remove("active");
+          if (link.dataset.page === this.currentPage) link.classList.add("active");
+        });
+      }
+
+      renderCurrentPage() {
+        const content = document.getElementById("pageContent");
+        const breadcrumb = document.getElementById("breadcrumb");
+        let html = "";
+
+        switch(this.currentPage) {
+          case "dashboard":
+            html = `
+              <h2>Dashboard</h2>
+              <div class="cards">
+                <div class="card"><h3>Pending Approvals</h3><p class="status-warning">12</p></div>
+                <div class="card"><h3>Team Expenses</h3><p>$28,750</p></div>
+                <div class="card"><h3>Escalated Items</h3><p class="status-error">3</p></div>
+                <div class="card"><h3>Team Members</h3><p>8</p></div>
+              </div>`;
+            break;
+
+          case "approveExpenses":
+            html = `
+              <h2>Approve/Reject Expenses</h2>
+              <table>
+                <thead><tr><th>Employee</th><th>Amount (USD)</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody>
+                  <tr><td>Jane Smith</td><td>$320</td><td class="status-warning">Pending</td><td><button class="btn-primary">Approve</button> <button class="btn-primary">Reject</button></td></tr>
+                  <tr><td>Mike Johnson</td><td>$150</td><td class="status-warning">Pending</td><td><button class="btn-primary">Approve</button> <button class="btn-primary">Reject</button></td></tr>
+                  <tr><td>Emily Davis</td><td>$500</td><td class="status-warning">Pending</td><td><button class="btn-primary">Approve</button> <button class="btn-primary">Reject</button></td></tr>
+                  <tr><td>Chris Lee</td><td>$1,200</td><td class="status-warning">Pending</td><td><button class="btn-primary">Approve</button> <button class="btn-primary">Reject</button></td></tr>
+                </tbody>
+              </table>`;
+            break;
+
+          case "teamExpenses":
+            html = `
+              <h2>Team Expenses</h2>
+              <table>
+                <thead><tr><th>Employee</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+                <tbody>
+                  <tr><td>Jane Smith</td><td>$320</td><td class="status-success">Approved</td><td>2025-10-01</td></tr>
+                  <tr><td>Mike Johnson</td><td>$150</td><td class="status-warning">Pending</td><td>2025-10-02</td></tr>
+                  <tr><td>Emily Davis</td><td>$500</td><td class="status-success">Approved</td><td>2025-10-03</td></tr>
+                  <tr><td>Chris Lee</td><td>$1,200</td><td class="status-error">Rejected</td><td>2025-10-03</td></tr>
+                  <tr><td>Robert Brown</td><td>$800</td><td class="status-success">Approved</td><td>2025-10-04</td></tr>
+                </tbody>
+              </table>`;
+            break;
+
+          case "escalateRules":
+            html = `
+              <h2>Escalate as per Rules</h2>
+              <div class="card">
+                <p>Expenses exceeding $1,000 must be escalated to Admin:</p>
+                <ul>
+                  <li>Chris Lee: $1,200 - <span class="status-warning">Escalated</span></li>
+                  <li>Robert Brown: $1,500 - <span class="status-warning">Escalated</span></li>
+                  <li>Linda Green: $2,300 - <span class="status-warning">Escalated</span></li>
+                </ul>
+                <button class="btn-primary">Review Escalations</button>
+              </div>`;
+            break;
+
+          case "analytics":
+            html = `
+              <h2>Analytics</h2>
+              <div class="cards">
+                <div class="card"><h3>Total Team Expenses</h3><p>$28,750</p></div>
+                <div class="card"><h3>Approved Expenses</h3><p>$15,000</p></div>
+                <div class="card"><h3>Pending Expenses</h3><p class="status-warning">5 items</p></div>
+                <div class="card"><h3>Rejected Expenses</h3><p class="status-error">3 items</p></div>
+              </div>
+              <div class="card" style="margin-top:20px;">
+                <h3>Top Spenders</h3>
+                <ul>
+                  <li>Emily Davis - $5,200</li>
+                  <li>Chris Lee - $3,100</li>
+                  <li>Robert Brown - $1,500</li>
+                </ul>
+              </div>`;
+            break;
+        }
+
+        content.innerHTML = html;
+        breadcrumb.innerHTML = `Home / <span>${this.capitalize(this.currentPage)}</span>`;
+      }
+
+      capitalize(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
+
+      saveNavigationState() {
+        const state = { page: this.currentPage, collapsed: this.sidebarCollapsed };
+        localStorage.setItem("managerNavState", JSON.stringify(state));
+      }
+
+      loadNavigationState() {
+        const state = JSON.parse(localStorage.getItem("managerNavState"));
+        if (state) {
+          this.currentPage = state.page;
+          this.sidebarCollapsed = state.collapsed;
+          if (this.sidebarCollapsed) document.getElementById("sidebar").classList.add("collapsed");
+        }
+        this.updateActiveNav();
+        this.renderCurrentPage();
+      }
+    }
+
+    new ManagerDashboard();
+  </script>
+</body>
+</html>
