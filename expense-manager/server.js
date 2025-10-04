@@ -38,9 +38,43 @@ app.post("/login", (req, res) => {
   if (!user) {
     return res.status(401).json({ message: "Invalid credentials" });
   }
-
+else{
   res.json({ message: "Login successful", role: user.role });
+
+}
 });
 
 const PORT = 5000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+
+
+// const API_URL = "http://localhost:5000";
+
+//     async function login() {
+//       const id = document.getElementById("userid").value;
+//       const password = document.getElementById("password").value;
+//       const role = document.getElementById("role").value;
+
+//       id.localStorage.setItem();
+
+//       const res = await fetch(`${API_URL}/login`, {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({ id, password, role })
+//       });
+
+//       const data = await res.json();
+
+//       if (res.ok) {
+//         // Navigate to role-specific page
+//         if (data.role === "admin") {
+//           window.location.href = "admin.html";
+//         } else if (data.role === "manager") {
+//           window.location.href = "manager.html";
+//         } else if (data.role === "employee") {
+//           window.location.href = "employee.html";
+//         }
+//       } else {
+//         alert(data.message); // Invalid credentials
+//       }
+//     }

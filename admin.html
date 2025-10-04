@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Expense Manager</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #ffffff;
+      display: flex;
+      height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 220px;
+      background-color: #1e1e1e;
+      padding: 20px;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.5);
+    }
+
+    .sidebar h2 {
+      color: #00d4ff;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 12px;
+      margin: 8px 0;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: #00aacc;
+    }
+
+    /* Main content */
+    .main {
+      flex: 1;
+      padding: 20px;
+      background-color: #181818;
+    }
+
+    .main h1 {
+      color: #00d4ff;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: #222;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+
+    .card h3 {
+      margin-top: 0;
+      color: #00d4ff;
+    }
+
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 6px;
+      background-color: #00d4ff;
+      color: #121212;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #00aacc;
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>Dashboard</h2>
+    <a href="#">Home</a>
+    <a href="#">Submit Expense</a>
+    <a href="#">Pending Approvals</a>
+    <a href="#">History</a>
+    <a href="login.html">Logout</a>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+    <h1>Welcome, Employee</h1>
+
+    <!-- Example card: Submit Expense -->
+    <div class="card">
+      <h3>Submit Expense</h3>
+      <form>
+        <input type="text" placeholder="Amount" required style="width:100%;padding:10px;margin:10px 0;border-radius:6px;border:none;background:#2c2c2c;color:#fff;">
+        <input type="text" placeholder="Category" required style="width:100%;padding:10px;margin:10px 0;border-radius:6px;border:none;background:#2c2c2c;color:#fff;">
+        <input type="date" required style="width:100%;padding:10px;margin:10px 0;border-radius:6px;border:none;background:#2c2c2c;color:#fff;">
+        <textarea placeholder="Description" rows="3" style="width:100%;padding:10px;margin:10px 0;border-radius:6px;border:none;background:#2c2c2c;color:#fff;"></textarea>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+
+    <!-- Example card: Pending Approvals -->
+    <div class="card">
+      <h3>Pending Approvals</h3>
+      <p>No pending requests.</p>
+    </div>
+  </div>
+</body>
+</html>
