@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Login/Signup Form</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
+
+        :root {
+            --primary-color: #6a5af9;
+            --secondary-color: #d66efd;
+            --dark-color: #1a1a2e;
+            --off-dark-color: #16213e;
+            --light-color: #e3e3e3;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+            /* --- ENHANCEMENT: RADIAL GRADIENT BACKGROUND --- */
+            background: #0f0c29; /* fallback */
+            background: radial-gradient(circle, var(--off-dark-color) 0%, var(--dark-color) 100%);
+        }
+
+        h1 {
+            font-weight: bold;
+            margin: 0;
+            color: var(--light-color);
+        }
+
+        p {
+            font-size: 14px;
+            font-weight: 100;
+            line-height: 20px;
+            letter-spacing: 0.5px;
+            margin: 20px 0 30px;
+            color: var(--light-color);
+        }
+
+        span {
+            font-size: 12px;
+            color: var(--light-color);
+        }
+
+        a {
+            color: #ccc;
+            font-size: 14px;
+            text-decoration: none;
+            margin: 15px 0;
+            /* --- ENHANCEMENT: SMOOTH TRANSITION ON LINKS --- */
+            transition: color 0.3s ease-in-out;
+        }
+
+        a:hover {
+            color: var(--secondary-color);
+        }
+
+        .container {
+            background-color: #24243e;
+            border-radius: 10px;
+            box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+            position: relative;
+            overflow: hidden;
+            width: 768px;
+            max-width: 100%;
+            min-height: 480px;
+        }
+
+        .form-container {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            /* --- ENHANCEMENT: SMOOTH FORM TRANSITIONS --- */
+            transition: all 0.6s ease-in-out;
+        }
+
+        .sign-in-container {
+            left: 0;
+            width: 50%;
+            z-index: 2;
+        }
+
+        .sign-up-container {
+            left: 0;
+            width: 50%;
+            opacity: 0;
+            z-index: 1;
+        }
+
+        form {
+            background-color: #24243e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 0 50px;
+            height: 100%;
+            text-align: center;
+        }
+
+        input {
+            background-color: #333;
+            border: none;
+            border-bottom: 2px solid #555;
+            padding: 12px 15px;
+            margin: 8px 0;
+            width: 100%;
+            color: var(--light-color);
+            border-radius: 5px;
+            /* --- ENHANCEMENT: SMOOTH INPUT TRANSITIONS --- */
+            transition: border-color 0.3s ease-in-out;
+        }
+
+        input:focus {
+            outline: none;
+            /* --- ENHANCEMENT: FOCUS STATE GRADIENT BORDER --- */
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        button {
+            border-radius: 20px;
+            border: 1px solid var(--primary-color);
+            color: #FFFFFF;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 12px 45px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            /* --- ENHANCEMENT: SMOOTH BUTTON TRANSITIONS --- */
+            transition: transform 80ms ease-in, box-shadow 0.3s ease, background 0.3s ease;
+
+            /* --- ENHANCEMENT: LINEAR GRADIENT BACKGROUND --- */
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            
+            /* --- ENHANCEMENT: GLOW EFFECT VIA BOX-SHADOW --- */
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        button:focus {
+            outline: none;
+        }
+
+        button:hover {
+            /* --- ENHANCEMENT: HOVER STATE GLOW --- */
+            box-shadow: 0 0 20px var(--primary-color), 0 0 30px var(--secondary-color);
+        }
+
+        button.ghost {
+            background-color: transparent;
+            border-color: #FFFFFF;
+            background: none;
+            box-shadow: none;
+        }
+
+        button.ghost:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            box-shadow: none;
+        }
+
+        .social-container {
+            margin: 20px 0;
+        }
+
+        .social-container a {
+            border: 1px solid #DDDDDD;
+            border-radius: 50%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 5px;
+            height: 40px;
+            width: 40px;
+            /* --- ENHANCEMENT: SOCIAL ICON TRANSITIONS --- */
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .social-container a:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* --- SLIDING ANIMATION LOGIC --- */
+        .overlay-container {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 50%;
+            height: 100%;
+            overflow: hidden;
+            transition: transform 0.6s ease-in-out;
+            z-index: 100;
+        }
+
+        .overlay {
+            /* --- ENHANCEMENT: OVERLAY GRADIENT --- */
+            background: #FF416C;
+            background: -webkit-linear-gradient(to right, var(--secondary-color), var(--primary-color));
+            background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: 0 0;
+            color: #FFFFFF;
+            position: relative;
+            left: -100%;
+            height: 100%;
+            width: 200%;
+            transform: translateX(0);
+            transition: transform 0.6s ease-in-out;
+        }
+
+        .overlay-panel {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 0 40px;
+            text-align: center;
+            top: 0;
+            height: 100%;
+            width: 50%;
+            transform: translateX(0);
+            transition: transform 0.6s ease-in-out;
+        }
+
+        .overlay-right {
+            right: 0;
+            transform: translateX(0);
+        }
+
+        .overlay-left {
+            transform: translateX(-20%);
+        }
+
+
+        /* --- MOVE OVERLAY AND FORMS ON JS CLASS TOGGLE --- */
+        .container.right-panel-active .sign-in-container {
+            transform: translateX(100%);
+        }
+
+        .container.right-panel-active .overlay-container {
+            transform: translateX(-100%);
+        }
+
+        .container.right-panel-active .sign-up-container {
+            transform: translateX(100%);
+            opacity: 1;
+            z-index: 5;
+            animation: show 0.6s;
+        }
+
+        .container.right-panel-active .overlay {
+            transform: translateX(50%);
+        }
+
+        .container.right-panel-active .overlay-left {
+            transform: translateX(0);
+        }
+
+        .container.right-panel-active .overlay-right {
+            transform: translateX(20%);
+        }
+
+
+        /* --- KEYFRAME ANIMATION FOR FADE-IN EFFECT --- */
+        @keyframes show {
+            0%, 49.99% {
+                opacity: 0;
+                z-index: 1;
+            }
+            50%, 100% {
+                opacity: 1;
+                z-index: 5;
+            }
+        }
+
+        /* --- RESPONSIVE DESIGN (MOBILE-FIRST) --- */
+        @media (max-width: 768px) {
+            .container {
+                width: 100%;
+                min-height: 100vh;
+                border-radius: 0;
+            }
+            .form-container {
+                width: 100%;
+            }
+            .sign-in-container {
+                z-index: 2;
+            }
+            .overlay-container {
+                display: none; /* Simplifies mobile UX */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <div class="form-container sign-up-container">
+            <form action="#">
+                <h1>Create Account</h1>
+                <div class="social-container">
+                    <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+                </div>
+                <span>or use your email for registration</span>
+                <input type="text" placeholder="Name" />
+                <input type="email" placeholder="Email" />
+                <input type="password" placeholder="Password" />
+                <button>Sign Up</button>
+            </form>
+        </div>
+        <div class="form-container sign-in-container">
+            <form action="#">
+                <h1>Sign In</h1>
+                <div class="social-container">
+                     <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+                </div>
+                <span>or use your account</span>
+                <input type="email" placeholder="Email" />
+                <input type="password" placeholder="Password" />
+                <a href="#" class="forgot">Forgot your password?</a>
+                <button>Sign In</button>
+            </form>
+        </div>
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1>Welcome Back!</h1>
+                    <p>To keep connected with us please login with your personal info</p>
+                    <button class="ghost" id="signIn">Sign In</button>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <h1>Hello, Friend!</h1>
+                    <p>Enter your personal details and start your journey with us</p>
+                    <button class="ghost" id="signUp">Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const signUpButton = document.getElementById('signUp');
+        const signInButton = document.getElementById('signIn');
+        const container = document.getElementById('container');
+
+        signUpButton.addEventListener('click', () => {
+            container.classList.add("right-panel-active");
+        });
+
+        signInButton.addEventListener('click', () => {
+            container.classList.remove("right-panel-active");
+        });
+    </script>
+</body>
+</html>
